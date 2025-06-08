@@ -3,6 +3,7 @@ package org.example.hexlet;
 import io.javalin.Javalin;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.rendering.template.JavalinJte;
+import org.example.hexlet.dto.courses.CoursePage;
 import org.example.hexlet.dto.courses.CoursesPage;
 import org.example.hexlet.model.Course;
 import org.example.hexlet.model.Post;
@@ -62,7 +63,13 @@ public class HelloWorld {
         });
 
         app.get("/courses/{id}", ctx -> {
-
+            var courseId = ctx.pathParamAsClass("id", Long.class).get();
+            var course = courses.stream()
+                .filter(c -> c.getId() == courseId)
+                .findFirst()
+                .orElseThrow(NotFoundResponse::new);
+            var page = new CoursePage(course);
+            ctx.render("courses/index.jte", model("page", page));
         });
 
         app.start(7070);

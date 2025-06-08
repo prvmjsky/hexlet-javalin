@@ -1,7 +1,8 @@
 @import org.example.hexlet.dto.courses.CoursesPage
 @param CoursesPage page
 
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <title>Хекслет</title>
