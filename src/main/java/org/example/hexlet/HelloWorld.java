@@ -1,6 +1,7 @@
 package org.example.hexlet;
 
 import io.javalin.Javalin;
+import io.javalin.rendering.template.JavalinJte;
 import org.example.hexlet.model.Post;
 import org.example.hexlet.model.User;
 
@@ -10,7 +11,10 @@ public class HelloWorld {
     public static void main(String[] args) {
         var app = Javalin.create(config -> {
             config.bundledPlugins.enableDevLogging();
+            config.fileRenderer(new JavalinJte());
         });
+
+        app.get("/", ctx -> ctx.render("index.jte"));
 
         app.get("/hello", ctx -> {
             var name = ctx.queryParamAsClass("name", String.class).getOrDefault("World");
