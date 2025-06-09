@@ -59,7 +59,7 @@ public class HelloWorld {
         app.get("/courses", ctx -> {
             var header = "Courses";
             var page = new CoursesPage(courses, header);
-            ctx.render("courses/show.jte", model("page", page));
+            ctx.render("courses/index.jte", model("page", page));
         });
 
         app.get("/courses/{id}", ctx -> {
@@ -69,7 +69,7 @@ public class HelloWorld {
                 .findFirst()
                 .orElseThrow(NotFoundResponse::new);
             var page = new CoursePage(course);
-            ctx.render("courses/index.jte", model("page", page));
+            ctx.render("courses/show.jte", model("page", page));
         });
 
         app.start(7070);
