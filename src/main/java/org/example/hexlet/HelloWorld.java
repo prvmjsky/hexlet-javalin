@@ -57,7 +57,7 @@ public class HelloWorld {
         });
 
         app.get("/courses", ctx -> {
-            var header = "Курсы по программированию";
+            var header = "Courses";
             var page = new CoursesPage(courses, header);
             ctx.render("courses/show.jte", model("page", page));
         });
