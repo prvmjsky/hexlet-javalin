@@ -1,15 +1,16 @@
 package org.example.hexlet;
 
 import io.javalin.Javalin;
-import io.javalin.http.NotFoundResponse;
 import io.javalin.rendering.template.JavalinJte;
 import org.example.hexlet.dto.courses.CoursePage;
 import org.example.hexlet.dto.courses.CoursesPage;
+import org.example.hexlet.dto.users.UserPage;
 import org.example.hexlet.model.Course;
 import org.example.hexlet.model.Post;
 import org.example.hexlet.model.User;
 
 import java.util.List;
+import java.util.Map;
 
 import static io.javalin.rendering.template.TemplateUtil.model;
 
@@ -31,19 +32,19 @@ public class HelloWorld {
             ctx.result(String.format("Hello, %s!", name));
         });
 
+        app.get("/users/{id}", ctx -> {
+            var id = ctx.pathParamAsClass("id", Long.class).get();
+            var user = FakePreparator.getById(users, id);
+            var page = new UserPage(user);
+            ctx.render("users/show.jte", model("page", page));
+        });
 
         app.get("/users/{id}/posts/{postId}", ctx -> {
             var userId = ctx.pathParamAsClass("id", Long.class).get();
             var postId = ctx.pathParamAsClass("postId", Long.class).get();
 
-            var user = users.stream()
-                            .filter(u -> u.getId() == userId)
-                            .findFirst()
-                            .orElseThrow(NotFoundResponse::new);
-            var post = posts.stream()
-                            .filter(p -> p.getId() == postId)
-                            .findFirst()
-                            .orElseThrow(NotFoundResponse::new);
+            var user = FakePreparator.getById(users, userId);
+            var post = FakePreparator.getById(posts, postId);
 
             user.addPost(post);
 
@@ -64,10 +65,7 @@ public class HelloWorld {
 
         app.get("/courses/{id}", ctx -> {
             var courseId = ctx.pathParamAsClass("id", Long.class).get();
-            var course = courses.stream()
-                .filter(c -> c.getId() == courseId)
-                .findFirst()
-                .orElseThrow(NotFoundResponse::new);
+            var course = FakePreparator.getById(courses, courseId);
             var page = new CoursePage(course);
             ctx.render("courses/show.jte", model("page", page));
         });

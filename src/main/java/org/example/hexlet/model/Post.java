@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Post {
+public class Post extends Model {
     private long id;
     private String title;
     private String content;

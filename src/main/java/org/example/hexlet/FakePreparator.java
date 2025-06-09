@@ -1,6 +1,8 @@
 package org.example.hexlet;
 
+import io.javalin.http.NotFoundResponse;
 import org.example.hexlet.model.Course;
+import org.example.hexlet.model.Model;
 import org.example.hexlet.model.Post;
 import org.example.hexlet.model.User;
 
@@ -29,5 +31,12 @@ public class FakePreparator {
         var course3 = new Course(3L, "PHP", "ZXC");
 
         return List.of(course1, course2, course3);
+    }
+
+    public static <T extends Model> T getById(List<T> fakes, long id) {
+        return fakes.stream()
+                    .filter(f -> f.getId() == id)
+                    .findFirst()
+                    .orElseThrow(NotFoundResponse::new);
     }
 }

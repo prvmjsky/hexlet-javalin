@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class User {
+public class User extends Model {
     private long id;
     private String name;
     private List<Post> posts;
