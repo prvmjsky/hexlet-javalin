@@ -10,7 +10,6 @@ import org.example.hexlet.model.Post;
 import org.example.hexlet.model.User;
 
 import java.util.List;
-import java.util.Map;
 
 import static io.javalin.rendering.template.TemplateUtil.model;
 
@@ -58,8 +57,19 @@ public class HelloWorld {
         });
 
         app.get("/courses", ctx -> {
-            var header = "Courses";
-            var page = new CoursesPage(courses, header);
+            var term = ctx.queryParam("term");
+            List<Course> filteredCourses;
+
+            if (term != null) {
+                filteredCourses = courses.stream()
+                    .filter(c -> c.getName().toLowerCase().contains(term.toLowerCase())
+                        || c.getDescription().toLowerCase().contains(term.toLowerCase()))
+                    .toList();
+            } else {
+                filteredCourses = List.copyOf(courses);
+            }
+
+            var page = new CoursesPage(filteredCourses, term);
             ctx.render("courses/index.jte", model("page", page));
         });
 

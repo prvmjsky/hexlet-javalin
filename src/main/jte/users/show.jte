@@ -2,16 +2,16 @@
 @param UserPage page
 
 @template.layout.main(
-head = @`
-    <meta charset="utf-8" />
-    <title>${page.getUser().getName()}</title>
-`,
-body = @`
-    <div class="col-lg-8 mx-auto p-4 py-md-5">
-        <main>
-            <h1>${page.getUser().getName()}</h1>
-            <p>The man.</p>
-        </main>
-    </div>
-`
+    head = @`
+        <meta charset="utf-8" />
+        <title>${page.getUser().getName()}</title>
+    `,
+    body = @`
+        <div class="col-lg-8 mx-auto p-4 py-md-5">
+            <main>
+                <h1>${page.getUser().getName()}</h1>
+                <p>The man.</p>
+            </main>
+        </div>
+    `
 )
