@@ -11,8 +11,7 @@ public class Post extends Model {
     private String content;
     private User author;
 
-    public Post(long id, String title, String content) {
-        this.id = id;
+    public Post(String title, String content) {
         this.title = title;
         this.content = content;
     }

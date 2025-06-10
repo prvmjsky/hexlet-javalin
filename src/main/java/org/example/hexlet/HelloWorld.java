@@ -1,13 +1,15 @@
 package org.example.hexlet;
 
 import io.javalin.Javalin;
+import io.javalin.http.NotFoundResponse;
 import io.javalin.rendering.template.JavalinJte;
 import org.example.hexlet.dto.courses.CoursePage;
 import org.example.hexlet.dto.courses.CoursesPage;
 import org.example.hexlet.dto.users.UserPage;
 import org.example.hexlet.model.Course;
-import org.example.hexlet.model.Post;
-import org.example.hexlet.model.User;
+import org.example.hexlet.repository.CourseRepository;
+import org.example.hexlet.repository.PostRepository;
+import org.example.hexlet.repository.UserRepository;
 
 import java.util.List;
 
@@ -15,9 +17,9 @@ import static io.javalin.rendering.template.TemplateUtil.model;
 
 public class HelloWorld {
     public static void main(String[] args) {
-        List<User> users = FakePreparator.prepareFakeUsers();
-        List<Post> posts = FakePreparator.prepareFakePosts();
-        List<Course> courses = FakePreparator.prepareFakeCourses();
+        UserRepository.fillWithFakes();
+        CourseRepository.fillWithFakes();
+        PostRepository.fillWithFakes();
 
         var app = Javalin.create(config -> {
             config.bundledPlugins.enableDevLogging();
@@ -33,7 +35,7 @@ public class HelloWorld {
 
         app.get("/users/{id}", ctx -> {
             var id = ctx.pathParamAsClass("id", Long.class).get();
-            var user = FakePreparator.getById(users, id);
+            var user = UserRepository.find(id).orElseThrow(NotFoundResponse::new);
             var page = new UserPage(user);
             ctx.render("users/show.jte", model("page", page));
         });
@@ -42,8 +44,8 @@ public class HelloWorld {
             var userId = ctx.pathParamAsClass("id", Long.class).get();
             var postId = ctx.pathParamAsClass("postId", Long.class).get();
 
-            var user = FakePreparator.getById(users, userId);
-            var post = FakePreparator.getById(posts, postId);
+            var user = UserRepository.find(userId).orElseThrow(NotFoundResponse::new);
+            var post = PostRepository.find(postId).orElseThrow(NotFoundResponse::new);
 
             user.addPost(post);
 
@@ -58,6 +60,7 @@ public class HelloWorld {
 
         app.get("/courses", ctx -> {
             var term = ctx.queryParam("term");
+            var courses = CourseRepository.getEntities();
             List<Course> filteredCourses;
 
             if (term != null) {
@@ -75,7 +78,7 @@ public class HelloWorld {
 
         app.get("/courses/{id}", ctx -> {
             var courseId = ctx.pathParamAsClass("id", Long.class).get();
-            var course = FakePreparator.getById(courses, courseId);
+            var course = CourseRepository.find(courseId).orElseThrow(NotFoundResponse::new);
             var page = new CoursePage(course);
             ctx.render("courses/show.jte", model("page", page));
         });

@@ -14,8 +14,7 @@ public final class Course extends Model {
     private String name;
     private String description;
 
-    public Course(long id, String name, String description) {
-        this.id = id;
+    public Course(String name, String description) {
         this.name = name;
         this.description = description;
     }

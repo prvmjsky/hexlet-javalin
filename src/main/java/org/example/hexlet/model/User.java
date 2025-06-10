@@ -11,10 +11,11 @@ import java.util.List;
 public class User extends Model {
     private long id;
     private String name;
+    private String email;
+    private String password;
     private List<Post> posts;
 
-    public User(long id, String name) {
-        this.id = id;
+    public User(String name, String email, String password) {
         this.name = name;
         posts = new ArrayList<>();
     }
