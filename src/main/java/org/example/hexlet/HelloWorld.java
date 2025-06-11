@@ -6,12 +6,16 @@ import io.javalin.rendering.template.JavalinJte;
 import org.example.hexlet.dto.courses.CoursePage;
 import org.example.hexlet.dto.courses.CoursesPage;
 import org.example.hexlet.dto.users.UserPage;
+import org.example.hexlet.dto.users.UsersPage;
 import org.example.hexlet.model.Course;
+import org.example.hexlet.model.User;
 import org.example.hexlet.repository.CourseRepository;
 import org.example.hexlet.repository.PostRepository;
 import org.example.hexlet.repository.UserRepository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static io.javalin.rendering.template.TemplateUtil.model;
 
@@ -33,11 +37,56 @@ public class HelloWorld {
             ctx.result(String.format("Hello, %s!", name));
         });
 
+        app.get("/users/build", ctx -> {
+            ctx.render("users/build.jte");
+        });
+
         app.get("/users/{id}", ctx -> {
             var id = ctx.pathParamAsClass("id", Long.class).get();
             var user = UserRepository.find(id).orElseThrow(NotFoundResponse::new);
             var page = new UserPage(user);
             ctx.render("users/show.jte", model("page", page));
+        });
+
+        app.get("/users", ctx -> {
+            var term = ctx.queryParam("term");
+            var users = UserRepository.getEntities();
+            List<User> filteredUsers;
+
+            if (term != null) {
+                filteredUsers = users.stream()
+                    .filter(c -> c.getName().toLowerCase().contains(term.toLowerCase())
+                        || c.getEmail().toLowerCase().contains(term.toLowerCase()))
+                    .toList();
+            } else {
+                filteredUsers = List.copyOf(users);
+            }
+
+            var page = new UsersPage(filteredUsers, term);
+            ctx.render("users/index.jte", model("page", page));
+        });
+
+        app.post("/users", ctx -> {
+            var name = ctx.formParam("name").trim();
+            var email = ctx.formParam("email").trim().toLowerCase();
+            var password = ctx.formParam("password");
+            var passwordConfirmation = ctx.formParam("passwordConfirmation");
+
+            String problem = null;
+            if (email.contains(" ")) {
+                problem = "There must be no whitespaces in email. Please try again";
+            } else if (!Objects.equals(password, passwordConfirmation)) {
+                problem = "Passwords don't match. Please try again";
+            } else {
+                UserRepository.save(new User(name, email, password));
+                ctx.redirect("/users");
+            }
+            var fields = Map.of(
+                "name", name,
+                "email", email,
+                "problem", problem
+            );
+            ctx.render("users/build.jte", fields);
         });
 
         app.get("/users/{id}/posts/{postId}", ctx -> {

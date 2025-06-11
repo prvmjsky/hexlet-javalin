@@ -9,6 +9,7 @@
             <main>
                 <h1 class="text-body-emphasis">Hello Hexlet!</h1>
                 <h3><a href="/courses">Programming courses</a></h3>
+                <h3><a href="/users">Users</a></h3>
             </main>
         </div>
     `
