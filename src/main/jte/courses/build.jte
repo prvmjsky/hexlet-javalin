@@ -1,14 +1,14 @@
 @param String name
-@param String email
+@param String description
 @param String problem = null
 
 @template.layout.main(
     head = @`
         <meta charset="utf-8">
-        <title>Registration</title>
+        <title>New course</title>
     `,
     body = @`
-        <form action ="/users" method="post">
+        <form action ="/courses" method="post">
             <div>
                 <label>
                     Name
@@ -17,23 +17,11 @@
             </div>
             <div>
                 <label>
-                    Email
-                    <input type="text" required name="email" value="${email}">
+                    Description
+                    <input type="text" required name="description" value="${description}">
                 </label>
             </div>
-            <div>
-                <label>
-                    Password
-                    <input type="text" required name="password">
-                </label>
-            </div>
-            <div>
-                <label>
-                    Password confirmation
-                    <input type="text" required name="passwordConfirmation">
-                </label>
-            </div>
-            <input type="submit" value="Register">
+            <input type="submit" value="Create">
         </form>
 
         @if (problem != null)

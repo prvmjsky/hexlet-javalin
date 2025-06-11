@@ -125,6 +125,18 @@ public class HelloWorld {
             ctx.render("courses/index.jte", model("page", page));
         });
 
+        app.get("/courses/build", ctx -> {
+            ctx.render("courses/build.jte");
+        });
+
+        app.post("/courses", ctx -> {
+            var name = ctx.formParam("name").trim();
+            var description = ctx.formParam("description").trim();
+
+            CourseRepository.save(new Course(name, description));
+            ctx.redirect("/courses");
+        });
+
         app.get("/courses/{id}", ctx -> {
             var courseId = ctx.pathParamAsClass("id", Long.class).get();
             var course = CourseRepository.find(courseId).orElseThrow(NotFoundResponse::new);
