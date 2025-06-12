@@ -18,19 +18,19 @@
             <div>
                 <label>
                     Email
-                    <input type="text" required name="email" value="${email}">
+                    <input type="email" required name="email" value="${email}">
                 </label>
             </div>
             <div>
                 <label>
                     Password
-                    <input type="text" required name="password">
+                    <input type="password" required name="password">
                 </label>
             </div>
             <div>
                 <label>
                     Password confirmation
-                    <input type="text" required name="passwordConfirmation">
+                    <input type="password" required name="passwordConfirmation">
                 </label>
             </div>
             <input type="submit" value="Register">
