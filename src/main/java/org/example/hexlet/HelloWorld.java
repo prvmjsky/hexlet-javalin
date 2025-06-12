@@ -3,6 +3,8 @@ package org.example.hexlet;
 import io.javalin.Javalin;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.rendering.template.JavalinJte;
+import io.javalin.validation.ValidationException;
+import org.example.hexlet.dto.users.BuildUserPage;
 import org.example.hexlet.dto.courses.CoursePage;
 import org.example.hexlet.dto.courses.CoursesPage;
 import org.example.hexlet.dto.users.UserPage;
@@ -38,7 +40,8 @@ public class HelloWorld {
         });
 
         app.get("/users/build", ctx -> {
-            ctx.render("users/build.jte");
+            var page = new BuildUserPage();
+            ctx.render("users/build.jte", model("page", page));
         });
 
         app.get("/users/{id}", ctx -> {
@@ -69,24 +72,18 @@ public class HelloWorld {
         app.post("/users", ctx -> {
             var name = ctx.formParam("name").trim();
             var email = ctx.formParam("email").trim().toLowerCase();
-            var password = ctx.formParam("password");
+            var passwordValidator = ctx.formParamAsClass("password", String.class);
             var passwordConfirmation = ctx.formParam("passwordConfirmation");
-
-            String problem = null;
-            if (email.contains(" ")) {
-                problem = "There must be no whitespaces in email. Please try again";
-            } else if (!Objects.equals(password, passwordConfirmation)) {
-                problem = "Passwords don't match. Please try again";
-            } else {
+            try {
+                var password = passwordValidator.check(value -> Objects.equals(value, passwordConfirmation),
+                    "Passwords don't match. Please try again")
+                    .get();
                 UserRepository.save(new User(name, email, password));
                 ctx.redirect("/users");
+            } catch (ValidationException e) {
+                var page = new BuildUserPage(name, email, e.getErrors());
+                ctx.render("users/build.jte", model("page", page));
             }
-            var fields = Map.of(
-                "name", name,
-                "email", email,
-                "problem", problem
-            );
-            ctx.render("users/build.jte", fields);
         });
 
         app.get("/users/{id}/posts/{postId}", ctx -> {

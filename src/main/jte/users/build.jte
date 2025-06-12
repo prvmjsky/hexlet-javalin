@@ -1,6 +1,5 @@
-@param String name
-@param String email
-@param String problem = null
+@import org.example.hexlet.dto.users.BuildUserPage
+@param BuildUserPage page
 
 @template.layout.main(
     head = @`
@@ -8,17 +7,27 @@
         <title>Registration</title>
     `,
     body = @`
+        @if(page.getErrors() != null)
+            <ul>
+                @for(var validator : page.getErrors().values())
+                    @for(var error : validator)
+                        <li>${error.getMessage()}</li>
+                    @endfor
+                @endfor
+            </ul>
+        @endif
+
         <form action ="/users" method="post">
             <div>
                 <label>
                     Name
-                    <input type="text" required name="name" value="${name}">
+                    <input type="text" required name="name" value="${page.getName()}">
                 </label>
             </div>
             <div>
                 <label>
                     Email
-                    <input type="email" required name="email" value="${email}">
+                    <input type="email" required name="email" value="${page.getEmail()}">
                 </label>
             </div>
             <div>
@@ -35,15 +44,6 @@
             </div>
             <input type="submit" value="Register">
         </form>
-
-        @if (problem != null)
-            <dialog open>
-                <p>${problem}</p>
-                <form method="dialog">
-                    <button formnovalidate>OK</button>
-                </form>
-            </dialog>
-        @endif
     `
 )
 
