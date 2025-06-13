@@ -1,3 +1,4 @@
+@import org.example.hexlet.NamedRoutes
 @import org.example.hexlet.dto.courses.CoursesPage
 @param CoursesPage page
 
@@ -8,7 +9,7 @@
     `,
     body = @`
         <h1>Courses</h1>
-        <h5><a href="/courses/build">Create new course</a></h5>
+        <h5><a href="${NamedRoutes.buildCoursePath()}">Create new course</a></h5>
         <h3>Search by name or description</h3>
         <form>
             <input type="search" name="term" value="${page.getTerm()}">
@@ -19,7 +20,7 @@
         @else
             @for(var course : page.getCourses())
                 <div>
-                    <h3><a href="/courses/${course.getId()}">${course.getName()}</a></h3>
+                    <h3><a href="${NamedRoutes.coursePath(course.getId())}">${course.getName()}</a></h3>
                     <p>${course.getDescription()}</p>
                 </div>
             @endfor

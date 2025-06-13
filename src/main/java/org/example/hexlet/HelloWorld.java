@@ -34,12 +34,12 @@ public class HelloWorld {
 
         app.get("/", ctx -> ctx.render("index.jte"));
 
-        app.get("/hello", ctx -> {
+        app.get(NamedRoutes.welcomingPath(), ctx -> {
             var name = ctx.queryParamAsClass("name", String.class).getOrDefault("World");
             ctx.result(String.format("Hello, %s!", name));
         });
 
-        app.get("/users", ctx -> {
+        app.get(NamedRoutes.usersPath(), ctx -> {
             var term = ctx.queryParam("term");
             var users = UserRepository.getEntities();
             List<User> filteredUsers;
@@ -57,7 +57,7 @@ public class HelloWorld {
             ctx.render("users/index.jte", model("page", page));
         });
 
-        app.post("/users", ctx -> {
+        app.post(NamedRoutes.usersPath(), ctx -> {
             var name = ctx.formParam("name").trim();
             var email = ctx.formParam("email").trim().toLowerCase();
             var passwordValidator = ctx.formParamAsClass("password", String.class);
@@ -67,19 +67,19 @@ public class HelloWorld {
                         "Passwords don't match")
                     .get();
                 UserRepository.save(new User(name, email, password));
-                ctx.redirect("/users");
+                ctx.redirect(NamedRoutes.usersPath());
             } catch (ValidationException e) {
                 var page = new BuildUserPage(name, email, e.getErrors());
                 ctx.render("users/build.jte", model("page", page));
             }
         });
 
-        app.get("/users/build", ctx -> {
+        app.get(NamedRoutes.buildUserPath(), ctx -> {
             var page = new BuildUserPage();
             ctx.render("users/build.jte", model("page", page));
         });
 
-        app.get("/users/{id}", ctx -> {
+        app.get(NamedRoutes.userPath("{id}"), ctx -> {
             var id = ctx.pathParamAsClass("id", Long.class).get();
             var user = UserRepository.find(id).orElseThrow(NotFoundResponse::new);
             var page = new UserPage(user);
@@ -104,7 +104,7 @@ public class HelloWorld {
                 """, user.getName(), post.getTitle(), post.getContent()));
         });
 
-        app.get("/courses", ctx -> {
+        app.get(NamedRoutes.coursesPath(), ctx -> {
             var term = ctx.queryParam("term");
             var courses = CourseRepository.getEntities();
             List<Course> filteredCourses;
@@ -122,7 +122,7 @@ public class HelloWorld {
             ctx.render("courses/index.jte", model("page", page));
         });
 
-        app.post("/courses", ctx -> {
+        app.post(NamedRoutes.coursesPath(), ctx -> {
             try {
                 var name = ctx.formParamAsClass("name", String.class)
                     .check(value -> value.length() >= 2,
@@ -133,7 +133,7 @@ public class HelloWorld {
                         "Description must be at least 10 characters")
                     .get();
                 CourseRepository.save(new Course(name, description));
-                ctx.redirect("/courses");
+                ctx.redirect(NamedRoutes.coursesPath());
             } catch (ValidationException e) {
                 var page = new BuildCoursePage(
                     ctx.formParam("name"),
@@ -144,12 +144,12 @@ public class HelloWorld {
             }
         });
 
-        app.get("/courses/build", ctx -> {
+        app.get(NamedRoutes.buildCoursePath(), ctx -> {
             var page = new BuildCoursePage();
             ctx.render("courses/build.jte", model("page", page));
         });
 
-        app.get("/courses/{id}", ctx -> {
+        app.get(NamedRoutes.coursePath("{id}"), ctx -> {
             var courseId = ctx.pathParamAsClass("id", Long.class).get();
             var course = CourseRepository.find(courseId).orElseThrow(NotFoundResponse::new);
             var page = new CoursePage(course);
