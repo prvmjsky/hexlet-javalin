@@ -3,11 +3,12 @@ package org.example.hexlet;
 import io.javalin.Javalin;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.rendering.template.JavalinJte;
-import org.example.hexlet.controllers.CoursesController;
-import org.example.hexlet.controllers.UsersController;
+import org.example.hexlet.controller.CoursesController;
+import org.example.hexlet.controller.UsersController;
 import org.example.hexlet.repository.CourseRepository;
 import org.example.hexlet.repository.PostRepository;
 import org.example.hexlet.repository.UserRepository;
+import org.example.hexlet.util.NamedRoutes;
 
 public class HelloWorld {
     public static void main(String[] args) {
