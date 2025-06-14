@@ -3,23 +3,11 @@ package org.example.hexlet;
 import io.javalin.Javalin;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.rendering.template.JavalinJte;
-import io.javalin.validation.ValidationException;
-import org.example.hexlet.dto.courses.BuildCoursePage;
-import org.example.hexlet.dto.users.BuildUserPage;
-import org.example.hexlet.dto.courses.CoursePage;
-import org.example.hexlet.dto.courses.CoursesPage;
-import org.example.hexlet.dto.users.UserPage;
-import org.example.hexlet.dto.users.UsersPage;
-import org.example.hexlet.model.Course;
-import org.example.hexlet.model.User;
+import org.example.hexlet.controllers.CoursesController;
+import org.example.hexlet.controllers.UsersController;
 import org.example.hexlet.repository.CourseRepository;
 import org.example.hexlet.repository.PostRepository;
 import org.example.hexlet.repository.UserRepository;
-
-import java.util.List;
-import java.util.Objects;
-
-import static io.javalin.rendering.template.TemplateUtil.model;
 
 public class HelloWorld {
     public static void main(String[] args) {
@@ -39,52 +27,21 @@ public class HelloWorld {
             ctx.result(String.format("Hello, %s!", name));
         });
 
-        app.get(NamedRoutes.usersPath(), ctx -> {
-            var term = ctx.queryParam("term");
-            var users = UserRepository.getEntities();
-            List<User> filteredUsers;
+        app.get(NamedRoutes.usersPath(), UsersController::index);
 
-            if (term != null) {
-                filteredUsers = users.stream()
-                    .filter(c -> c.getName().toLowerCase().contains(term.toLowerCase())
-                        || c.getEmail().toLowerCase().contains(term.toLowerCase()))
-                    .toList();
-            } else {
-                filteredUsers = List.copyOf(users);
-            }
+        app.post(NamedRoutes.usersPath(), UsersController::create);
 
-            var page = new UsersPage(filteredUsers, term);
-            ctx.render("users/index.jte", model("page", page));
-        });
+        app.get(NamedRoutes.buildUserPath(), UsersController::build);
 
-        app.post(NamedRoutes.usersPath(), ctx -> {
-            var name = ctx.formParam("name").trim();
-            var email = ctx.formParam("email").trim().toLowerCase();
-            var passwordValidator = ctx.formParamAsClass("password", String.class);
-            var passwordConfirmation = ctx.formParam("passwordConfirmation");
-            try {
-                var password = passwordValidator.check(value -> Objects.equals(value, passwordConfirmation),
-                        "Passwords don't match")
-                    .get();
-                UserRepository.save(new User(name, email, password));
-                ctx.redirect(NamedRoutes.usersPath());
-            } catch (ValidationException e) {
-                var page = new BuildUserPage(name, email, e.getErrors());
-                ctx.render("users/build.jte", model("page", page));
-            }
-        });
+        app.get(NamedRoutes.userPath("{id}"), UsersController::show);
 
-        app.get(NamedRoutes.buildUserPath(), ctx -> {
-            var page = new BuildUserPage();
-            ctx.render("users/build.jte", model("page", page));
-        });
+        app.get(NamedRoutes.coursesPath(), CoursesController::index);
 
-        app.get(NamedRoutes.userPath("{id}"), ctx -> {
-            var id = ctx.pathParamAsClass("id", Long.class).get();
-            var user = UserRepository.find(id).orElseThrow(NotFoundResponse::new);
-            var page = new UserPage(user);
-            ctx.render("users/show.jte", model("page", page));
-        });
+        app.post(NamedRoutes.coursesPath(), CoursesController::create);
+
+        app.get(NamedRoutes.buildCoursePath(), CoursesController::build);
+
+        app.get(NamedRoutes.coursePath("{id}"), CoursesController::show);
 
         app.get("/users/{id}/posts/{postId}", ctx -> {
             var userId = ctx.pathParamAsClass("id", Long.class).get();
@@ -102,58 +59,6 @@ public class HelloWorld {
                 
                 %s
                 """, user.getName(), post.getTitle(), post.getContent()));
-        });
-
-        app.get(NamedRoutes.coursesPath(), ctx -> {
-            var term = ctx.queryParam("term");
-            var courses = CourseRepository.getEntities();
-            List<Course> filteredCourses;
-
-            if (term != null) {
-                filteredCourses = courses.stream()
-                    .filter(c -> c.getName().toLowerCase().contains(term.toLowerCase())
-                        || c.getDescription().toLowerCase().contains(term.toLowerCase()))
-                    .toList();
-            } else {
-                filteredCourses = List.copyOf(courses);
-            }
-
-            var page = new CoursesPage(filteredCourses, term);
-            ctx.render("courses/index.jte", model("page", page));
-        });
-
-        app.post(NamedRoutes.coursesPath(), ctx -> {
-            try {
-                var name = ctx.formParamAsClass("name", String.class)
-                    .check(value -> value.length() >= 2,
-                        "Name must be at least 2 characters")
-                    .get();
-                var description = ctx.formParamAsClass("description", String.class)
-                    .check(value -> value.length() >= 10,
-                        "Description must be at least 10 characters")
-                    .get();
-                CourseRepository.save(new Course(name, description));
-                ctx.redirect(NamedRoutes.coursesPath());
-            } catch (ValidationException e) {
-                var page = new BuildCoursePage(
-                    ctx.formParam("name"),
-                    ctx.formParam("description"),
-                    e.getErrors()
-                );
-                ctx.render("courses/build.jte", model("page", page));
-            }
-        });
-
-        app.get(NamedRoutes.buildCoursePath(), ctx -> {
-            var page = new BuildCoursePage();
-            ctx.render("courses/build.jte", model("page", page));
-        });
-
-        app.get(NamedRoutes.coursePath("{id}"), ctx -> {
-            var courseId = ctx.pathParamAsClass("id", Long.class).get();
-            var course = CourseRepository.find(courseId).orElseThrow(NotFoundResponse::new);
-            var page = new CoursePage(course);
-            ctx.render("courses/show.jte", model("page", page));
         });
 
         app.start(7070);

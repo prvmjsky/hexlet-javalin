@@ -1,0 +1,65 @@
+package org.example.hexlet.controllers;
+
+import io.javalin.http.Context;
+import io.javalin.http.NotFoundResponse;
+import io.javalin.validation.ValidationException;
+import org.example.hexlet.NamedRoutes;
+import org.example.hexlet.dto.users.BuildUserPage;
+import org.example.hexlet.dto.users.UserPage;
+import org.example.hexlet.dto.users.UsersPage;
+import org.example.hexlet.model.User;
+import org.example.hexlet.repository.UserRepository;
+
+import java.util.List;
+import java.util.Objects;
+
+import static io.javalin.rendering.template.TemplateUtil.model;
+
+public class UsersController {
+    public static void index(Context ctx) {
+        var term = ctx.queryParam("term");
+        var users = UserRepository.getEntities();
+        List<User> filteredUsers;
+
+        if (term != null) {
+            filteredUsers = users.stream()
+                .filter(c -> c.getName().toLowerCase().contains(term.toLowerCase())
+                    || c.getEmail().toLowerCase().contains(term.toLowerCase()))
+                .toList();
+        } else {
+            filteredUsers = List.copyOf(users);
+        }
+
+        var page = new UsersPage(filteredUsers, term);
+        ctx.render("users/index.jte", model("page", page));
+    }
+
+    public static void show(Context ctx) {
+        var id = ctx.pathParamAsClass("id", Long.class).get();
+        var user = UserRepository.find(id).orElseThrow(NotFoundResponse::new);
+        var page = new UserPage(user);
+        ctx.render("users/show.jte", model("page", page));
+    }
+
+    public static void build(Context ctx) {
+        var page = new BuildUserPage();
+        ctx.render("users/build.jte", model("page", page));
+    }
+
+    public static void create(Context ctx) {
+        var name = ctx.formParam("name").trim();
+        var email = ctx.formParam("email").trim().toLowerCase();
+        var passwordValidator = ctx.formParamAsClass("password", String.class);
+        var passwordConfirmation = ctx.formParam("passwordConfirmation");
+        try {
+            var password = passwordValidator.check(value -> Objects.equals(value, passwordConfirmation),
+                    "Passwords don't match")
+                .get();
+            UserRepository.save(new User(name, email, password));
+            ctx.redirect(NamedRoutes.usersPath());
+        } catch (ValidationException e) {
+            var page = new BuildUserPage(name, email, e.getErrors());
+            ctx.render("users/build.jte", model("page", page));
+        }
+    }
+}
