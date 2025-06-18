@@ -1,5 +1,7 @@
 package org.example.hexlet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.javalin.Javalin;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.rendering.template.JavalinJte;
@@ -10,7 +12,12 @@ import org.example.hexlet.repository.PostRepository;
 import org.example.hexlet.repository.UserRepository;
 import org.example.hexlet.util.NamedRoutes;
 
-public class HelloWorld {
+import java.time.Instant;
+
+public class App {
+
+    public static final Logger LOG = LoggerFactory.getLogger(App.class);
+
     public static void main(String[] args) {
         UserRepository.fillWithFakes();
         CourseRepository.fillWithFakes();
@@ -20,6 +27,8 @@ public class HelloWorld {
             config.bundledPlugins.enableDevLogging();
             config.fileRenderer(new JavalinJte());
         });
+
+        app.before(ctx -> LOG.info(Instant.now().toString()));
 
         app.get("/", ctx -> ctx.render("index.jte"));
 
