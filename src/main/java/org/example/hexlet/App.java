@@ -1,5 +1,6 @@
 package org.example.hexlet;
 
+import org.example.hexlet.controller.SessionsController;
 import org.example.hexlet.dto.MainPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +34,14 @@ public class App {
 
         app.before(ctx -> LOG.info(Instant.now().toString()));
 
+        app.get(NamedRoutes.buildSessionPath(), SessionsController::build);
+        app.post(NamedRoutes.sessionsPath(), SessionsController::create);
+        app.delete(NamedRoutes.sessionsPath(), SessionsController::destroy);
+
         app.get("/", ctx -> {
             var visited = Boolean.valueOf(ctx.cookie("visited"));
-            var page = new MainPage(visited);
+            String currentUser = ctx.sessionAttribute("currentUser");
+            var page = new MainPage(visited, currentUser);
             ctx.render("index.jte", model("page", page));
             ctx.cookie("visited", String.valueOf(true));
         });
@@ -46,19 +52,13 @@ public class App {
         });
 
         app.get(NamedRoutes.usersPath(), UsersController::index);
-
-        app.post(NamedRoutes.usersPath(), UsersController::create);
-
         app.get(NamedRoutes.buildUserPath(), UsersController::build);
-
+        app.post(NamedRoutes.usersPath(), UsersController::create);
         app.get(NamedRoutes.userPath("{id}"), UsersController::show);
 
         app.get(NamedRoutes.coursesPath(), CoursesController::index);
-
-        app.post(NamedRoutes.coursesPath(), CoursesController::create);
-
         app.get(NamedRoutes.buildCoursePath(), CoursesController::build);
-
+        app.post(NamedRoutes.coursesPath(), CoursesController::create);
         app.get(NamedRoutes.coursePath("{id}"), CoursesController::show);
 
         app.get("/users/{id}/posts/{postId}", ctx -> {

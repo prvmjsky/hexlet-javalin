@@ -5,7 +5,7 @@
 @template.layout.main(
     head = @`
         <meta charset="utf-8">
-        <title>Registration</title>
+        <title>Creating user</title>
     `,
     body = @`
         @if(page.getErrors() != null)

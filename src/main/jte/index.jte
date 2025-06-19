@@ -12,9 +12,22 @@
         <div class="col-lg-8 mx-auto p-4 py-md-5">
             <main>
                 <h1 class="text-body-emphasis">Hello Hexlet!</h1>
-                @if(!page.isVisited())
-                    This message is shown because you are visiting this page for the first time.
+
+                @if(page.getCurrentUser() != null)
+                    <div>
+                        Hello, ${page.getCurrentUser()}!
+                        <br><br>
+                    </div>
                 @endif
+
+                @if(!page.isVisited())
+                    <div>
+                        You're visiting us for the first time!
+                        <br>
+                        Or you've simply cleaned your cookies...
+                    </div>
+                @endif
+
                 <h3><a href="${NamedRoutes.coursesPath()}">Programming courses</a></h3>
                 <h3><a href="${NamedRoutes.usersPath()}">Users</a></h3>
             </main>

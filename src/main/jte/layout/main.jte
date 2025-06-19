@@ -13,7 +13,8 @@
         <header>
             <nav>
                 <h1><a href="/">Hexlet</a></h1>
-                <h5><a href="${NamedRoutes.buildUserPath()}">Register</a></h5>
+                <h5><a href="${NamedRoutes.buildUserPath()}">Create user</a></h5>
+                <h5><a href="${NamedRoutes.buildSessionPath()}">Sign in</a></h5>
             </nav>
         </header>
         ${body}
