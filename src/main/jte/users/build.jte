@@ -3,6 +3,7 @@
 @param BuildUserPage page
 
 @template.layout.main(
+    page = page,
     head = @`
         <meta charset="utf-8">
         <title>Creating user</title>

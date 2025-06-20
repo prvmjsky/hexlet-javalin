@@ -2,6 +2,7 @@
 @param UserPage page
 
 @template.layout.main(
+    page = page,
     head = @`
         <meta charset="utf-8">
         <title>${page.getUser().getName()}</title>

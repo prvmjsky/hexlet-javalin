@@ -3,6 +3,7 @@
 @param UsersPage page
 
 @template.layout.main(
+    page = page,
     head = @`
         <meta charset="utf-8">
         <title>Users</title>

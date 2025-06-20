@@ -3,6 +3,7 @@
 @param BuildCoursePage page
 
 @template.layout.main(
+    page = page,
     head = @`
         <meta charset="utf-8">
         <title>New course</title>

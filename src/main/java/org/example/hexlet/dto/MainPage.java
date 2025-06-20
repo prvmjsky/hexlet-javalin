@@ -7,7 +7,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class MainPage {
+public class MainPage extends BasePage {
     private Boolean visited;
     private String currentUser;
 

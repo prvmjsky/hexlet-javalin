@@ -31,6 +31,8 @@ public class UsersController {
         }
 
         var page = new UsersPage(filteredUsers, term);
+        page.setFlash(ctx.consumeSessionAttribute("flash"));
+        page.setFlashType(ctx.consumeSessionAttribute("flash-type"));
         ctx.render("users/index.jte", model("page", page));
     }
 
@@ -56,9 +58,13 @@ public class UsersController {
                     "Passwords don't match")
                 .get();
             UserRepository.save(new User(name, email, password));
+            ctx.sessionAttribute("flash", "User successfully created");
+            ctx.sessionAttribute("flash-type", "alert alert-success");
             ctx.redirect(NamedRoutes.usersPath());
         } catch (ValidationException e) {
             var page = new BuildUserPage(name, email, e.getErrors());
+            page.setFlash("Failed to create user");
+            page.setFlashType("alert alert-danger");
             ctx.render("users/build.jte", model("page", page));
         }
     }
