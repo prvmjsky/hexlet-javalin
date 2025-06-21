@@ -50,20 +50,24 @@ public class UsersController {
     }
 
     public static void create(Context ctx) throws SQLException {
-        var name = ctx.formParam("name").trim();
-        var email = ctx.formParam("email").trim().toLowerCase();
-        var passwordValidator = ctx.formParamAsClass("password", String.class);
-        var passwordConfirmation = ctx.formParam("passwordConfirmation");
+        var name = ctx.formParamAsClass("name", String.class).get().trim();
+        var email = ctx.formParamAsClass("email", String.class).get().trim().toLowerCase();
+
         try {
-            var password = passwordValidator.check(value -> Objects.equals(value, passwordConfirmation),
+            var passwordConfirmation = ctx.formParam("passwordConfirmation");
+            var password = ctx.formParamAsClass("password", String.class)
+                .check(value -> Objects.equals(value, passwordConfirmation),
                     "Passwords don't match")
                 .get();
             UserRepository.save(new User(name, email, password));
+
             ctx.sessionAttribute("flash", "User successfully created");
             ctx.sessionAttribute("flash-type", "alert alert-success");
             ctx.redirect(NamedRoutes.usersPath());
+
         } catch (ValidationException e) {
             var page = new BuildUserPage(name, email, e.getErrors());
+
             page.setFlash("Failed to create user");
             page.setFlashType("alert alert-danger");
             ctx.render("users/build.jte", model("page", page));

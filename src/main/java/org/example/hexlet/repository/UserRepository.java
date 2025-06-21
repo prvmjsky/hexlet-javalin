@@ -12,9 +12,8 @@ public class UserRepository extends BaseRepository {
 
     public static void save(User user) throws SQLException {
         var sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
-        try (
-            var conn = dataSource.getConnection();
-            var stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
+        try (var conn = dataSource.getConnection();
+             var stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
         ) {
             stmt.setString(1, user.getName());
             stmt.setString(2, user.getEmail());
@@ -104,5 +103,27 @@ public class UserRepository extends BaseRepository {
         save(sam);
         save(tom);
         save(pam);
+    }
+
+    public static boolean nameExists(String name) throws SQLException {
+        var sql = "SELECT id FROM users WHERE name = ?";
+        try (var conn = dataSource.getConnection();
+             var stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setString(1, name);
+            var rs = stmt.executeQuery();
+            return rs.next();
+        }
+    }
+
+    public static boolean emailExists(String email) throws SQLException {
+        var sql = "SELECT id FROM users WHERE email = ?";
+        try (var conn = dataSource.getConnection();
+             var stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setString(1, email);
+            var rs = stmt.executeQuery();
+            return rs.next();
+        }
     }
 }
