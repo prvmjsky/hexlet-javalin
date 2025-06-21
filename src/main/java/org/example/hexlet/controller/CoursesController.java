@@ -10,12 +10,13 @@ import org.example.hexlet.dto.courses.CoursesPage;
 import org.example.hexlet.model.Course;
 import org.example.hexlet.repository.CourseRepository;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import static io.javalin.rendering.template.TemplateUtil.model;
 
 public class CoursesController {
-    public static void index(Context ctx) {
+    public static void index(Context ctx) throws SQLException {
         var term = ctx.queryParam("term");
         var courses = CourseRepository.getEntities();
         List<Course> filteredCourses;
@@ -33,7 +34,7 @@ public class CoursesController {
         ctx.render("courses/index.jte", model("page", page));
     }
 
-    public static void show(Context ctx) {
+    public static void show(Context ctx) throws SQLException {
         var courseId = ctx.pathParamAsClass("id", Long.class).get();
         var course = CourseRepository.find(courseId).orElseThrow(NotFoundResponse::new);
         var page = new CoursePage(course);
@@ -45,7 +46,7 @@ public class CoursesController {
         ctx.render("courses/build.jte", model("page", page));
     }
 
-    public static void create(Context ctx) {
+    public static void create(Context ctx) throws SQLException {
         try {
             var name = ctx.formParamAsClass("name", String.class)
                 .check(value -> value.length() >= 2,

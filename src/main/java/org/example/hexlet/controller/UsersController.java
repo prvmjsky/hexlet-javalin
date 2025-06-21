@@ -10,13 +10,14 @@ import org.example.hexlet.dto.users.UsersPage;
 import org.example.hexlet.model.User;
 import org.example.hexlet.repository.UserRepository;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
 import static io.javalin.rendering.template.TemplateUtil.model;
 
 public class UsersController {
-    public static void index(Context ctx) {
+    public static void index(Context ctx) throws SQLException {
         var term = ctx.queryParam("term");
         var users = UserRepository.getEntities();
         List<User> filteredUsers;
@@ -36,7 +37,7 @@ public class UsersController {
         ctx.render("users/index.jte", model("page", page));
     }
 
-    public static void show(Context ctx) {
+    public static void show(Context ctx) throws SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var user = UserRepository.find(id).orElseThrow(NotFoundResponse::new);
         var page = new UserPage(user);
@@ -48,7 +49,7 @@ public class UsersController {
         ctx.render("users/build.jte", model("page", page));
     }
 
-    public static void create(Context ctx) {
+    public static void create(Context ctx) throws SQLException {
         var name = ctx.formParam("name").trim();
         var email = ctx.formParam("email").trim().toLowerCase();
         var passwordValidator = ctx.formParamAsClass("password", String.class);

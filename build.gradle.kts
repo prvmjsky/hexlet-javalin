@@ -30,6 +30,9 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.36")
 
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
+
+    implementation("com.h2database:h2:2.2.220")
+    implementation("com.zaxxer:HikariCP:5.0.1")
 }
 
 tasks.test {
