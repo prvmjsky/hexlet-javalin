@@ -29,9 +29,14 @@ public class App {
 
     public static final Logger LOG = LoggerFactory.getLogger(App.class);
 
+    public static String getDatabaseUrl() {
+        return System.getenv().getOrDefault("JDBC_DATABASE_URL",
+            "jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
+    }
+
     public static Javalin getApp() throws SQLException {
         var hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl("jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
+        hikariConfig.setJdbcUrl(getDatabaseUrl());
 
         var dataSource = new HikariDataSource(hikariConfig);
 
