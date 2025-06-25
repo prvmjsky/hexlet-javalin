@@ -33,6 +33,7 @@ dependencies {
 
     implementation("com.h2database:h2:2.2.220")
     implementation("com.zaxxer:HikariCP:5.0.1")
+    implementation("org.postgresql:postgresql:42.7.7")
 }
 
 tasks.test {
