@@ -18,7 +18,9 @@ import org.example.hexlet.repository.UserRepository;
 import org.example.hexlet.util.NamedRoutes;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.stream.Collectors;
@@ -28,6 +30,13 @@ import static io.javalin.rendering.template.TemplateUtil.model;
 public class App {
 
     private static final Logger LOG = LoggerFactory.getLogger(App.class);
+
+    private static String readResourceFile(String fileName) throws IOException {
+        var inputStream = App.class.getClassLoader().getResourceAsStream(fileName);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            return reader.lines().collect(Collectors.joining("\n"));
+        }
+    }
 
     private static int getPort() {
         var port = System.getenv().getOrDefault("PORT", "7070");
@@ -39,16 +48,13 @@ public class App {
             "jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
     }
 
-    private static Javalin getApp() throws SQLException {
+    private static Javalin getApp() throws SQLException, IOException {
         var hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(getDatabaseUrl());
 
         var dataSource = new HikariDataSource(hikariConfig);
 
-        var url = App.class.getClassLoader().getResourceAsStream("schema.sql");
-        var sql = new BufferedReader(new InputStreamReader(url))
-            .lines().collect(Collectors.joining("\n"));
-
+        var sql = readResourceFile("schema.sql");
         try (
             var connection = dataSource.getConnection();
             var statement = connection.createStatement()
@@ -66,7 +72,7 @@ public class App {
         return app;
     }
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, IOException {
         var app = getApp();
         app.before(ctx -> LOG.info(Instant.now().toString()));
 
