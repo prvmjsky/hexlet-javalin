@@ -27,14 +27,19 @@ import static io.javalin.rendering.template.TemplateUtil.model;
 
 public class App {
 
-    public static final Logger LOG = LoggerFactory.getLogger(App.class);
+    private static final Logger LOG = LoggerFactory.getLogger(App.class);
 
-    public static String getDatabaseUrl() {
+    private static int getPort() {
+        var port = System.getenv().getOrDefault("PORT", "7070");
+        return Integer.parseInt(port);
+    }
+
+    private static String getDatabaseUrl() {
         return System.getenv().getOrDefault("JDBC_DATABASE_URL",
             "jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
     }
 
-    public static Javalin getApp() throws SQLException {
+    private static Javalin getApp() throws SQLException {
         var hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(getDatabaseUrl());
 
@@ -114,6 +119,6 @@ public class App {
                 """, user.getName(), post.getTitle(), post.getContent()));
         });
 
-        app.start(7070);
+        app.start(getPort());
     }
 }
