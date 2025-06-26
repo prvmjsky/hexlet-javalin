@@ -54,12 +54,14 @@ public class App {
 
         var dataSource = new HikariDataSource(hikariConfig);
 
-        var sql = readResourceFile("schema.sql");
         try (
             var connection = dataSource.getConnection();
             var statement = connection.createStatement()
         ) {
+            var sql = readResourceFile("schema.sql");
             statement.execute(sql);
+        } catch (NullPointerException e) {
+            System.out.println("No SQL schema found");
         }
 
         BaseRepository.dataSource = dataSource;
